@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">MyToDoList</string>
+
+    <string name="registerRecommend1">No account?  </string>
+    <string name="registerRecommendLink">Sign Up </string>
+    <string name="registerRecommend2"> now!</string>
+
+    <string name="text_label_1">HOME</string>
+    <string name="text_label_2">지도</string>
+    <string name="text_label_3">더하기</string>
+    <string name="text_label_4">Notification</string>
+    <string name="text_label_5">Profile</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="register_id">Account Number</string>
+    <string name="register_password">Password</string>
+    <string name="register_repassword">Password Again</string>
+    <string name="register_email">Email</string>
+    <string name="register_btn">Get Start</string>
+    <string name="register_cancel">Cancel</string>
+    <string name="register_btn_next">Next</string>
+    <string name="register_birth">Birthday</string>
+    <string name="register_submit">Submit</string>
+    <string name="register_back">Back</string>
+    <string name="register_name">Name</string>
+    <string name="search_nickname">Nikename</string>
+    <string name="add_content">TO DO WHAT</string>
+    <string name="add_memo">MEMO</string>
+    <string name="add_date">DATE</string>
+    <string name="add_time">TIME</string>
+    <string name="add_location">LOCATION</string>
+    <string name="share">SHARE</string>
+    <string name="level">LEVEL</string>
+
+
+    <string-array name="filter_spinner">
+        <item>등록 순</item>
+        <item>다 된 일 숨기기</item>
+        <item>내가 할 일</item>
+        <item>공유 된 일</item>
+        <item>시간 순</item>
+        <item>중요도</item>
+    </string-array>
+
+    <string-array name="my_page_setting">
+        <item>설정</item>
+        <item>로그아웃</item>
+    </string-array>
+
+    <string-array name="friend_setting">
+        <item>친구 끊기</item>
+    </string-array>
+</resources>
