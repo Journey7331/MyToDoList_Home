@@ -6,10 +6,5 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BaseActivity extends AppCompatActivity {
-    public Map<String, String> params = new HashMap<>();
-
-
-
-
 
 }

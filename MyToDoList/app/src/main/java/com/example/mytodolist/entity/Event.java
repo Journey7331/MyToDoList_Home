@@ -1,35 +1,39 @@
 package com.example.mytodolist.entity;
 
-public class Todos {
-    private int todo_id;
+import java.util.Date;
+
+/**
+ * @program: MyToDoList
+ * @description: Event 类
+ */
+public class Event {
+    private int _id;
     private String content;
     private boolean done;
     private String date;
 //    private String type;
 
 
-
-
-    public Todos() {
-        this.todo_id = 0;
+    public Event() {
+        this._id = 0;
         this.content = "";
         this.done = false;
         this.date = "";
     }
 
-    public Todos(int todo_id, String content, boolean done, String date) {
-        this.todo_id = todo_id;
+    public Event(int _id, String content, boolean done, String date) {
+        this._id = _id;
         this.content = content;
         this.done = done;
         this.date = date;
     }
 
-    public int getTodo_id() {
-        return todo_id;
+    public int get_id() {
+        return _id;
     }
 
-    public void setTodo_id(int todo_id) {
-        this.todo_id = todo_id;
+    public void set_id(int _id) {
+        this._id = _id;
     }
 
     public String getContent() {
@@ -40,7 +44,7 @@ public class Todos {
         this.content = content;
     }
 
-    public boolean getDone() {
+    public boolean isDone() {
         return done;
     }
 
@@ -58,11 +62,11 @@ public class Todos {
 
     @Override
     public String toString() {
-        return "Todos{" +
-                "content='" + content + '\'' +
+        return "Event{" +
+                "_id='" + _id + '\'' +
+                ", content='" + content + '\'' +
                 ", done=" + done +
-                ", date='" + date + '\'' +
+                ", date=" + date +
                 '}';
     }
-
 }

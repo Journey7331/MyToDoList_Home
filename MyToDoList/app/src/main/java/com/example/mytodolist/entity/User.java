@@ -1,38 +1,47 @@
 package com.example.mytodolist.entity;
 
 public class User {
-    int user_id;
-    String id;
-    String pw;
-    String name;
-    String email;
-    String birth;
+    private int    _id;
+    private String phone;
+    private String pwd;
+    private String name;
+    private String email;
+    private String birth;
+    static String phoneNow = ""; //当前登录的用户
 
     public User() {
     }
 
-    public int getUser_id() {
-        return user_id;
+    public static String getPhoneNow() {
+        return phoneNow;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public static void setPhoneNow(String phoneNow) {
+        User.phoneNow = phoneNow;
     }
 
-    public String getId() {
-        return id;
+    public int get_id() {
+        return _id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void set_id(int _id) {
+        this._id = _id;
     }
 
-    public String getPw() {
-        return pw;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setPw(String pw) {
-        this.pw = pw;
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPwd() {
+        return pwd;
+    }
+
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
     }
 
     public String getName() {
@@ -62,9 +71,9 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "user_id=" + user_id +
-                ", id='" + id + '\'' +
-                ", pw='" + pw + '\'' +
+                "user_id=" + _id +
+                ", phone='" + phone + '\'' +
+                ", pwd='" + pwd + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", birth='" + birth + '\'' +

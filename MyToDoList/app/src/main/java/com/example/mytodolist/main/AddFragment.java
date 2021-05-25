@@ -39,13 +39,12 @@ public class AddFragment extends BaseFragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add, container, false);
         etContent = view.findViewById(R.id.et_content);
-        etMemo = view.findViewById(R.id.et_memo);
-        etDate = view.findViewById(R.id.et_date);
-        etTime = view.findViewById(R.id.et_time);
-        etLocation = view.findViewById(R.id.et_location);
+        etMemo = view.findViewById(R.id.et_memo);   // 备注
+        etDate = view.findViewById(R.id.et_date);   // 日期
+        etTime = view.findViewById(R.id.et_time);   // 时间
+        etLocation = view.findViewById(R.id.et_location);   // 位置
         etShare = view.findViewById(R.id.et_share);
         switchDate = view.findViewById(R.id.switch_date);
         switchTime = view.findViewById(R.id.switch_time);
@@ -78,18 +77,17 @@ public class AddFragment extends BaseFragment implements View.OnClickListener {
 
     }
 
-    // EDIT TEXT
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.et_date) {
             // 日期
-            Log.d("debugging", "Select Date.");
+            Log.d("debugging", "** Select Date.");
         } else if (v.getId() == R.id.et_time) {
-            Log.d("debugging", "Select Time.");
+            Log.d("debugging", "** Select Time.");
         } else if (v.getId() == R.id.et_location) {
-            Log.d("debugging", "Select Location.");
+            Log.d("debugging", "** Select Location.");
         } else if (v.getId() == R.id.et_share) {
-            Log.d("debugging", "Select Share");
+            Log.d("debugging", "** Select Share.");
         }
     }
 }
