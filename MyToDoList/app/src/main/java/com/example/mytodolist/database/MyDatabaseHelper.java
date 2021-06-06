@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
-import com.example.mytodolist.MemoApplication;
-
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     // 数据库名

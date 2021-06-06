@@ -1,22 +1,31 @@
 package com.example.mytodolist.database;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
+
+import com.example.mytodolist.entity.Event;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @program: MyToDoList
  * @description: EventDB
  */
 public class EventDB implements MyDatabaseHelper.TableCreateInterface {
-// 表名
+    // 表名
     public static String TableName = "events";
     // 字段名
     public static String _id = "_id";           // 主键
     public static String content = "content";   // 内容
+    public static String memo = "memo";         // 备注
     public static String done = "done";         // 是否完成
     public static String date = "date";         // ddl
+    public static String time = "time";         // 时间
 //    public static String type = "type";         // 类型
 //    public static String color = "color";       // 颜色
 
@@ -36,8 +45,10 @@ public class EventDB implements MyDatabaseHelper.TableCreateInterface {
         String sql = "create table if not exists " + EventDB.TableName + "("
                 + BaseColumns._ID + " integer primary key autoincrement, "
                 + EventDB.content + " text,"
+                + EventDB.memo + " text,"
                 + EventDB.done + " boolean,"
-                + EventDB.date + " text"
+                + EventDB.date + " text,"
+                + EventDB.time + " text "
                 + ")";
 
         db.execSQL(sql);
@@ -59,16 +70,54 @@ public class EventDB implements MyDatabaseHelper.TableCreateInterface {
         db.insert(EventDB.TableName, null, eventValues);
         String content = eventValues.get(EventDB.content).toString();
         Log.i("insert", "** insert an event: " + content + " **");
+        db.close();
     }
 
 
     // 删除Event By Id
-    public static void deleteEventById(MyDatabaseHelper dbHelper, int id) {
+    public static void deleteEventById(MyDatabaseHelper dbHelper, String id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(EventDB.TableName, BaseColumns._ID + "=?", new String[]{id + ""});
         db.close();
     }
 
-    // 
+    // 更新Event By Id
+    public static void updateEventById(MyDatabaseHelper dbHelper, String id, ContentValues values) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.update(
+                EventDB.TableName,
+                values,
+                BaseColumns._ID + " =? ",
+                new String[]{id + ""}
+        );
+        String content = values.get(EventDB.content).toString();
+        Log.i("update", "** Update an event: " + content);
+
+        db.close();
+    }
+
+    // 获取数据库中所有的Event
+    public static ArrayList<Event> queryAllEvent(MyDatabaseHelper dbHelper) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        ArrayList<Event> list = new ArrayList<>();
+        Cursor cursor = db.rawQuery("select * from " + EventDB.TableName, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                Event event = new Event();
+                event.set_id(cursor.getInt(cursor.getColumnIndex(EventDB._id)));
+                event.setContent(cursor.getString(cursor.getColumnIndex(EventDB.content)));
+                event.setMemo(cursor.getString(cursor.getColumnIndex(EventDB.memo)));
+                event.setDone(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(EventDB.done))));
+                event.setDate(cursor.getString(cursor.getColumnIndex(EventDB.date)));
+                event.setTime(cursor.getString(cursor.getColumnIndex(EventDB.time)));
+                list.add(event);
+            }
+        }
+
+        cursor.close();
+        db.close();
+        return list;
+    }
+
 
 }

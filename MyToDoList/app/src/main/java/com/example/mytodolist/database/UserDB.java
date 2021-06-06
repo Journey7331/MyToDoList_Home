@@ -64,25 +64,11 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
     public static void insertUser(MyDatabaseHelper dbHelper, ContentValues userValues) {
         // 获得可写的数据库实例
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-//        // 查询手机号是否唯一
-//        Cursor cursor = db.query(
-//                UserDB.TableName,
-//                null,
-//                UserDB.phone + " =? ",
-//                new String[]{userValues.get(UserDB.phone) + ""},
-//                null,
-//                null,
-//                null
-//        );
-//        if (cursor.getCount() == 0) {
-            // 插入用户
-            db.insert(UserDB.TableName, null, userValues);
-            Log.i("insert", "** insert user, phone number: " + userValues.get(UserDB.phone) + " **");
-//        } else {
-//            // 如果重复则不插入,且返回 账号已存在 的信息
-//            Log.i("insert", "** phone number " + userValues.get(UserDB.phone) + " already exists **");
-//            cursor.close();
-//        }
+
+        // 插入用户
+        db.insert(UserDB.TableName, null, userValues);
+        Log.i("insert", "** insert user, phone number: " + userValues.get(UserDB.phone) + " **");
+
         db.close();
     }
 
@@ -177,7 +163,7 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
         return userMap;
     }
 
-
+    // 查重
     public static boolean checkPhoneExist(MyDatabaseHelper dbHelper, String phone) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         boolean ret = false;
@@ -190,7 +176,7 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
                 null,
                 null
         );
-        if (cursor.getCount() > 0){
+        if (cursor.getCount() > 0) {
             ret = true;
             Log.i("register", "** Phone Has Been Registered.");
         }
@@ -218,16 +204,16 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
                 null,
                 null
         );
-        if (cursor.getCount() == 0){
+        if (cursor.getCount() == 0) {
             Log.i("Login", "** No This Phone.");
             ret = -1;
-        }else {
+        } else {
             cursor.moveToFirst();
             String pwd = cursor.getString(cursor.getColumnIndex(UserDB.pwd));
             if (pwd.equals(password)) {
                 Log.i("Login", "** All Correct. Log In Successfully.");
-                ret =  1;
-            }else {
+                ret = 1;
+            } else {
                 Log.i("Login", "** Password Wrong.");
                 ret = 0;
             }
@@ -237,6 +223,5 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
         db.close();
         return ret;
     }
-
 
 }

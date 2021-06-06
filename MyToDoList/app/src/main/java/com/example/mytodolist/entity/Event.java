@@ -9,8 +9,10 @@ import java.util.Date;
 public class Event {
     private int _id;
     private String content;
+    private String memo;
     private boolean done;
     private String date;
+    private String time;
 //    private String type;
 
 
@@ -26,6 +28,22 @@ public class Event {
         this.content = content;
         this.done = done;
         this.date = date;
+    }
+
+    public String getMemo() {
+        return memo;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public int get_id() {

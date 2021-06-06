@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.example.mytodolist.R;
 import com.example.mytodolist.base.BaseActivity;
-import com.example.mytodolist.database.DBTemplate;
 import com.example.mytodolist.database.MyDatabaseHelper;
 import com.example.mytodolist.database.UserDB;
 
@@ -22,7 +21,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     String phone;
     String password;
-    DBTemplate dbTemplate = new DBTemplate(this);
+    MyDatabaseHelper mysql = new MyDatabaseHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +55,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 Toast.makeText(this, "Please Enter Password.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            int ret = dbTemplate.loginUser(phone, password);
+            int ret = UserDB.login(mysql, phone, password);
             if (ret == 0){
                 Toast.makeText(this, "Password Wrong.", Toast.LENGTH_SHORT).show();
             }else if (ret == -1){

@@ -22,7 +22,7 @@
                 android:id="@+id/et_search"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:hint="@string/search_nickname"
                 android:textColorHint="#333333"
                 android:paddingStart="16dp"

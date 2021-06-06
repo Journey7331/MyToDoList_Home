@@ -3,7 +3,6 @@ package com.example.mytodolist.main;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.telecom.StatusHints;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -12,12 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.ActivityOptionsCompat;
 
 import com.example.mytodolist.R;
 import com.example.mytodolist.base.BaseRegisterActivity;
-import com.example.mytodolist.database.DBTemplate;
 import com.example.mytodolist.database.MyDatabaseHelper;
 import com.example.mytodolist.database.UserDB;
 
@@ -32,7 +28,7 @@ public class RegisterActivity1 extends BaseRegisterActivity implements View.OnCl
     EditText etRegisterRepassword;
     Button btnRegister;
     TextView btnRegisterCancel;
-    DBTemplate dbTemplate = new DBTemplate(this);
+    MyDatabaseHelper mysql = new MyDatabaseHelper(this);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,7 +63,7 @@ public class RegisterActivity1 extends BaseRegisterActivity implements View.OnCl
         if (v.getId() == R.id.btn_register) {
             if (checkRegister1(etRegisterId, etRegisterPassword, etRegisterRepassword)) {
                 String phone = etRegisterId.getText().toString();
-                if (dbTemplate.queryPhone(phone)) {
+                if (UserDB.checkPhoneExist(mysql, phone)) {
                     Toast.makeText(this, "Phone Has Been Registered.", Toast.LENGTH_SHORT).show();
                     etRegisterId.setText("");
                     etRegisterId.requestFocus();

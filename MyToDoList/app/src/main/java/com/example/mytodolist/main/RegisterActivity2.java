@@ -14,12 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.ActivityOptionsCompat;
 
 import com.example.mytodolist.R;
 import com.example.mytodolist.base.BaseRegisterActivity;
-import com.example.mytodolist.database.DBTemplate;
+import com.example.mytodolist.database.MyDatabaseHelper;
 import com.example.mytodolist.database.UserDB;
 
 import java.text.SimpleDateFormat;
@@ -42,7 +40,7 @@ public class RegisterActivity2 extends BaseRegisterActivity implements View.OnCl
     AlertDialog.Builder builder;
     DatePicker datePicker;
     final Calendar cal = Calendar.getInstance();
-    DBTemplate dbTemplate = new DBTemplate(this);
+    MyDatabaseHelper mysql = new MyDatabaseHelper(this);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,16 +75,14 @@ public class RegisterActivity2 extends BaseRegisterActivity implements View.OnCl
             final DatePicker datePicker = view.findViewById(R.id.register_date_picker);
 
             builder.setView(view);
-            builder.setNegativeButton("Cancel", ((dialog, which) -> {
-                etBirth.setText("");
-            }));
-            builder.setPositiveButton("Submit", (((dialog, which) -> {
+            builder.setNegativeButton("Cancel", (dialog, which) -> etBirth.setText(""));
+            builder.setPositiveButton("Submit", (dialog, which) -> {
                 cal.set(Calendar.YEAR, datePicker.getYear());
                 cal.set(Calendar.MONTH, datePicker.getMonth());
                 cal.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
                 etBirth.setText(sdf.format(cal.getTime()));
-            })));
+            });
 
             AlertDialog dialog = builder.create();
             dialog.show();
@@ -110,7 +106,7 @@ public class RegisterActivity2 extends BaseRegisterActivity implements View.OnCl
                 values.put(UserDB.name, name);
                 values.put(UserDB.birth, birth);
                 values.put(UserDB.email, email);
-                dbTemplate.insertUser(values);
+                UserDB.insertUser(mysql, values);
 
                 Toast.makeText(this,"Account Created.",Toast.LENGTH_SHORT).show();
                 ActivityOptions options = ActivityOptions.makeCustomAnimation(this, R.anim.slide_back2, R.anim.slide_back1);

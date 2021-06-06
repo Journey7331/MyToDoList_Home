@@ -5,6 +5,19 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".main.AddFragment">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="12dp">
+
+        <View
+            android:id="@+id/add_view"
+            android:layout_height="100dp"
+            android:layout_width="100dp"
+            android:layout_centerHorizontal="true"
+            android:background="@mipmap/add" />
+
+    </RelativeLayout>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,8 +29,9 @@
                 android:id="@+id/et_content"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:hint="@string/add_content"
+                android:cursorVisible="false"
                 android:textColorHint="#333333"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
@@ -38,8 +52,9 @@
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:layout_marginTop="4dp"
+                android:cursorVisible="false"
                 android:text=""
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:hint="@string/add_memo"
                 android:textColorHint="#333333"
                 android:paddingStart="16dp"
@@ -52,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_below="@+id/et_memo"
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:layout_marginTop="32dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp">
@@ -95,7 +110,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_below="@+id/rl_date"
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp">
@@ -140,7 +155,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_below="@+id/rl_time"
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp">
@@ -184,7 +199,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_below="@+id/rl_location"
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp">
@@ -227,7 +242,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_below="@+id/rl_share"
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
@@ -266,8 +281,6 @@
 
             </RelativeLayout>
 
-
-
         </RelativeLayout>
     </ScrollView>
     <Button
@@ -275,7 +288,7 @@
         android:layout_alignParentBottom="true"
         android:layout_width="144dp"
         android:layout_height="40dp"
-        android:text="Register"
+        android:text="Finish"
         android:layout_marginBottom="32dp"
         android:textStyle="bold"
         android:layout_centerHorizontal="true"

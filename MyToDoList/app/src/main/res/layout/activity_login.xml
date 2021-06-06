@@ -34,11 +34,11 @@
                 android:id="@+id/et_loginUsername"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:hint="Username"
                 android:inputType="textVisiblePassword|textNoSuggestions"
                 android:paddingLeft="16dp"
-
+                android:cursorVisible="false"
                 android:textColorHint="#333333" />
 
             <EditText
@@ -46,10 +46,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/login_edittext"
+                android:background="@drawable/edittext_select"
                 android:hint="Password"
                 android:inputType="textPassword"
                 android:paddingLeft="16dp"
+                android:cursorVisible="false"
                 android:textColorHint="#333333" />
         </LinearLayout>
 
