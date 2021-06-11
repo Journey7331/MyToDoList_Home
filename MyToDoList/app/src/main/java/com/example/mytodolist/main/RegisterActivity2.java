@@ -26,7 +26,7 @@ import java.util.Locale;
 
 /**
  * @program: MyToDoList
- * @description: 注册页第二页：姓名、邮箱、出生日期
+ * @description: name email birth
  */
 public class RegisterActivity2 extends BaseRegisterActivity implements View.OnClickListener {
 

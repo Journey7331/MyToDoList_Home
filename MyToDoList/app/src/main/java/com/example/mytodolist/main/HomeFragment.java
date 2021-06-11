@@ -2,16 +2,22 @@ package com.example.mytodolist.main;
 
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,32 +29,36 @@ import com.example.mytodolist.adapter.EventAdapter;
 import com.example.mytodolist.base.BaseFragment;
 import com.example.mytodolist.database.EventDB;
 import com.example.mytodolist.database.MyDatabaseHelper;
-import com.example.mytodolist.entity.AddressEvent;
+import com.example.mytodolist.database.UserDB;
 import com.example.mytodolist.entity.Event;
+import com.example.mytodolist.entity.User;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 /**
  * @program: MyToDoList
- * @description:
+ * @description: HomeFragment
  */
-public class HomeFragment extends BaseFragment implements View.OnClickListener, AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener {
+public class HomeFragment extends BaseFragment implements CompoundButton.OnCheckedChangeListener, PopupMenu.OnMenuItemClickListener {
 
     EventAdapter adapter;
-    ArrayList<AddressEvent> arr;
-    ArrayList<AddressEvent> filtered;
+    ArrayList<Event> arr;
+    ArrayList<Event> filtered;
     ListView list;
     SwipeRefreshLayout pullToRefresh;
     SwitchCompat switchDone;
 
     TextView logoIcon;
-    Button btnSearchFriend;
-    Spinner filterSpinner;
+    Button filterButton;
 
-    SearchFragment searchFragment;
+//    SearchFragment searchFragment;
 
     RelativeLayout emptyPage;
     MyDatabaseHelper mysql;
@@ -57,7 +67,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     // 获取数据并刷新
-    public void refresh(ArrayList<AddressEvent> arr) {
+    public void refresh(ArrayList<Event> arr) {
         adapter = new EventAdapter(getActivity(), arr);
         list.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -68,75 +78,110 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-//        load_start();
 
         mysql = new MyDatabaseHelper(getContext());
-        arr = new ArrayList<>();
         filtered = new ArrayList<>();
 
-        ArrayList allEvent = EventDB.queryAllEvent(mysql);
-        for (Object o : allEvent) {
-            AddressEvent event = new AddressEvent();
-            event.setEvent((Event) o);
-            arr.add(event);
-        }
+        arr = EventDB.queryAllEvent(mysql);
 
-        list = (ListView) view.findViewById(R.id.home_list);
+        list = view.findViewById(R.id.home_list);
         list.setItemsCanFocus(false);
         logoIcon = view.findViewById(R.id.tv_icon);
-        pullToRefresh = (SwipeRefreshLayout) view.findViewById(R.id.pullToRefresh);
-        filterSpinner = (Spinner) view.findViewById(R.id.filter_spinner);
-        btnSearchFriend = (Button) view.findViewById(R.id.btn_search_friend);
+        pullToRefresh = view.findViewById(R.id.pullToRefresh);
+        filterButton = view.findViewById(R.id.filter_button);
         switchDone = view.findViewById(R.id.switch_done);
         emptyPage = view.findViewById(R.id.empty_status);
         switchDone.setChecked(true);
-        searchFragment = new SearchFragment();
+//        searchFragment = new SearchFragment();
 
         refresh(arr);
         checkEmpty(arr);
+
+        setHello();
+
+        registerForContextMenu(filterButton);
+        filterButton.setOnClickListener(l -> {
+            showPopupMenu(filterButton);
+        });
 
         // Pull To Refresh
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                filterSpinner.setSelection(0);
-                filterSpinner.setSelected(false);
+                switchDone.setChecked(true);
                 refresh(arr);
                 checkEmpty(arr);
-                SystemClock.sleep(300);
+                SystemClock.sleep(200);
                 pullToRefresh.setRefreshing(false);
             }
         });
 
-
-        btnSearchFriend.setOnClickListener(this);
-        logoIcon.setOnClickListener(this);
-        filterSpinner.setOnItemSelectedListener(this);
+        // Do not show "Done" Events
         switchDone.setOnCheckedChangeListener(this);
 
         return view;
     }
 
+    private void setHello() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        // 5 - 9
+        if (5 <= hour && hour <= 9) {
+            logoIcon.setText("Morning!");
+            // 10 - 12
+        } else if (10 <= hour && hour <= 12) {
+            logoIcon.setText("Noon~");
+            // 13 - 15
+        } else if (13 <= hour && hour <= 16) {
+            logoIcon.setText("AfterNoon!");
+            // 16 - 19
+        } else if (17 <= hour && hour <= 19) {
+            logoIcon.setText("Evening~");
+            // 20 - 22
+        } else if (20 <= hour && hour <= 22) {
+            logoIcon.setText("Night!");
+            // 23 - 4
+        } else {
+            logoIcon.setText("MidNight~");
+        }
 
-    private void filterEvents(int position) {
-        switch (position) {
-            case 0:
-                // 登记顺序
-                arr.sort((o1, o2) -> o1.getEvent().get_id() - o2.getEvent().get_id());
+        String phone = UserDB.getPhone(mysql, 0);
+        if (phone != "") logoIcon.append(" " + UserDB.getName(mysql, phone) + ".");
+        else logoIcon.append(" Stranger.");
+
+    }
+
+
+    private void showPopupMenu(View view) {
+        // View当前PopupMenu显示的相对View的位置
+        PopupMenu popupMenu = new PopupMenu(getContext(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.sort_event_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(this);
+
+        popupMenu.show();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sort_1:
+                // Sort by add time
+                arr.sort((o1, o2) -> o1.get_id() - o2.get_id());
                 refresh(arr);
                 break;
-            case 1:
-                // 时间顺序
+            case R.id.sort_2:
+                // sort by date
                 arr.sort((o1, o2) -> {
                     SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
                     SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm");
-                    String date1 = o1.getEvent().getDate();
-                    String date2 = o2.getEvent().getDate();
+                    String date1 = o1.getDate();
+                    String date2 = o2.getDate();
                     Date o1Date = null;
                     Date o2Date = null;
 
-                    String time1 = o1.getEvent().getTime();
-                    String time2 = o2.getEvent().getTime();
+                    String time1 = o1.getTime();
+                    String time2 = o2.getTime();
                     Date o1Time = null;
                     Date o2Time = null;
 
@@ -176,19 +221,46 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
                 });
                 refresh(arr);
                 break;
+            case R.id.sort_3:
+                // Sort by id first
+                arr.sort((o1, o2) -> o1.get_id() - o2.get_id());
+                // Sort by Level
+                arr.sort((o1, o2) -> {
+                    double diff = o1.getLevel() - o2.getLevel();
+                    if (Double.isNaN(o1.getLevel()) && Double.isNaN(o2.getLevel()))
+                        return 0;
+                    if (Double.isNaN(o1.getLevel())) return 1;
+                    if (Double.isNaN(o2.getLevel())) return -1;
+                    return Double.compare(0.0, diff);
+                });
+                refresh(arr);
+                break;
+
         }
-
-
+        return false;
     }
+
+
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(1, 0, 1, "Sort by Add-Time");
+        menu.add(1, 1, 1, "Sort by Date");
+        menu.add(1, 2, 1, "Sort by Priority");
+        menu.add(1, 3, 1, "Hide Done Event");
+        menu.add(1, 4, 1, "Hide UnDone Event");
+    }
+
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
         if (isChecked) {
             refresh(arr);
         } else {
             filtered.clear();
-            for (AddressEvent event : arr) {
-                if (!event.getEvent().isDone()) {
+            for (Event event : arr) {
+                if (!event.isDone()) {
                     filtered.add(event);
                 }
             }
@@ -196,27 +268,7 @@ public class HomeFragment extends BaseFragment implements View.OnClickListener, 
         }
     }
 
-
-    @Override
-    public void onClick(View v) {
-
-    }
-
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        filterEvents(position);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-
-
-
-    private void checkEmpty(ArrayList<AddressEvent> arr) {
+    private void checkEmpty(ArrayList<Event> arr) {
         if (arr.size() < 1) {
             emptyPage.setVisibility(View.VISIBLE);
             list.setVisibility(View.INVISIBLE);

@@ -9,8 +9,6 @@ import android.util.Log;
 import com.example.mytodolist.entity.Event;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * @program: MyToDoList
@@ -26,6 +24,7 @@ public class EventDB implements MyDatabaseHelper.TableCreateInterface {
     public static String done = "done";         // 是否完成
     public static String date = "date";         // ddl
     public static String time = "time";         // 时间
+    public static String level = "level";       // 优先度
 //    public static String type = "type";         // 类型
 //    public static String color = "color";       // 颜色
 
@@ -46,9 +45,10 @@ public class EventDB implements MyDatabaseHelper.TableCreateInterface {
                 + BaseColumns._ID + " integer primary key autoincrement, "
                 + EventDB.content + " text,"
                 + EventDB.memo + " text,"
-                + EventDB.done + " boolean,"
+                + EventDB.done + " text,"
                 + EventDB.date + " text,"
-                + EventDB.time + " text "
+                + EventDB.time + " text,"
+                + EventDB.level + " float"
                 + ")";
 
         db.execSQL(sql);
@@ -96,6 +96,17 @@ public class EventDB implements MyDatabaseHelper.TableCreateInterface {
         db.close();
     }
 
+    // 更新Event Done State by Id
+    public static void updateEventDoneState(MyDatabaseHelper dbHelper, String id, boolean status) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(EventDB.done, status+"");    // Change Boolean To String
+        db.update(EventDB.TableName, values, BaseColumns._ID + " = ? ", new String[]{id + ""});
+        Log.i("update", "** Done State Change: " + status);
+
+        db.close();
+    }
+
     // 获取数据库中所有的Event
     public static ArrayList<Event> queryAllEvent(MyDatabaseHelper dbHelper) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -107,9 +118,11 @@ public class EventDB implements MyDatabaseHelper.TableCreateInterface {
                 event.set_id(cursor.getInt(cursor.getColumnIndex(EventDB._id)));
                 event.setContent(cursor.getString(cursor.getColumnIndex(EventDB.content)));
                 event.setMemo(cursor.getString(cursor.getColumnIndex(EventDB.memo)));
+                // Done  |  DateBase：String  |  Class: Boolean
                 event.setDone(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(EventDB.done))));
                 event.setDate(cursor.getString(cursor.getColumnIndex(EventDB.date)));
                 event.setTime(cursor.getString(cursor.getColumnIndex(EventDB.time)));
+                event.setLevel(cursor.getFloat(cursor.getColumnIndex(EventDB.level)));
                 list.add(event);
             }
         }

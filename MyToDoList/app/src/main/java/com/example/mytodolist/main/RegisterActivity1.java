@@ -19,7 +19,7 @@ import com.example.mytodolist.database.UserDB;
 
 /**
  * @program: MyToDoList
- * @description:
+ * @description: phone | password | rePassword
  */
 public class RegisterActivity1 extends BaseRegisterActivity implements View.OnClickListener {
 

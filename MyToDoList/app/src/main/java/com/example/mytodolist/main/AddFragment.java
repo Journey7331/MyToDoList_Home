@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -38,9 +40,9 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
 
     String finalDate, finalTime;
 
-//    Address finalLocation;
+    //    Address finalLocation;
 //    String finalShare;
-//    String finalLevel;
+    float finalLevel;
 
     public AddFragment() {
     }
@@ -62,13 +64,13 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
         etTime = view.findViewById(R.id.et_time);
 //        etLocation = view.findViewById(R.id.et_location);
 //        etShare = view.findViewById(R.id.et_share);
-//        etLevel = view.findViewById(R.id.et_level);
+        etLevel = view.findViewById(R.id.et_level);
 
         switchDate = view.findViewById(R.id.switch_date);
         switchTime = view.findViewById(R.id.switch_time);
 //        switchLocation = view.findViewById(R.id.switch_location);
 //        switchShare = view.findViewById(R.id.switch_share);
-//        switchLevel = view.findViewById(R.id.switch_level);
+        switchLevel = view.findViewById(R.id.switch_level);
 
         btnSubmit = view.findViewById(R.id.btn_submit);
 
@@ -76,33 +78,34 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
         finalTime = "";
 //        finalLocation = new Address();
 //        finalShare = "";
-//        finalLevel = "";
+        finalLevel = -1;
 
         etDate.setOnClickListener(this);
         etTime.setOnClickListener(this);
 //        etLocation.setOnClickListener(this);
 //        etShare.setOnClickListener(this);
-//        etLevel.setOnClickListener(this);
+        etLevel.setOnClickListener(this);
 
         switchDate.setOnCheckedChangeListener(this);
         switchTime.setOnCheckedChangeListener(this);
 //        switchLocation.setOnCheckedChangeListener(this);
 //        switchShare.setOnCheckedChangeListener(this);
-//        switchLevel.setOnCheckedChangeListener(this);
+        switchLevel.setOnCheckedChangeListener(this);
 
 
         btnSubmit.setOnClickListener(v -> {
             hideKeyboard(getActivity());
             if (etContent.length() == 0) {
-                Toast.makeText(getContext(), "Tell What You Want To Do.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Tell Me What You Want To Do.", Toast.LENGTH_SHORT).show();
                 etContent.requestFocus();
             } else if (etDate.length() == 0 && etTime.length() > 0) {
                 Toast.makeText(getContext(), "Choose A Day.", Toast.LENGTH_SHORT).show();
                 switchDate.setChecked(true);
+                etDate.performClick();
                 etDate.requestFocus();
             } else {
                 insertItem();
-                ((BottomNavigationView)getActivity().findViewById(R.id.bottom_navigation)).setSelectedItemId(R.id.page_1);
+                ((BottomNavigationView) getActivity().findViewById(R.id.bottom_navigation)).setSelectedItemId(R.id.page_1);
             }
         });
         return view;
@@ -115,11 +118,14 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
         values.put(EventDB.done, "false");
         values.put(EventDB.date, finalDate);
         values.put(EventDB.time, finalTime);
+        values.put(EventDB.level, finalLevel);
+
+        // TODO Put Location
 
         MyDatabaseHelper mysql = new MyDatabaseHelper(getContext());
         EventDB.insertEvent(mysql, values);
-
-        Toast.makeText(getContext(), "Successfully Added!  " + "Content: " + etContent.getText().toString(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), "Successfully Added!  " + "Content: " + etContent.getText().toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Successfully Added!", Toast.LENGTH_SHORT).show();
     }
 
     // 按下 EditText 的提示
@@ -137,10 +143,66 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
 //        } else if (v.getId() == R.id.et_share) {
 //            setupShare();
 //            Log.i("addEvent", "** Select Share.");
-//        } else if (v.getId() == R.id.et_level) {
-//            setupLevel();
-//            Log.i("addEvent", "** Select Level.");
+        } else if (v.getId() == R.id.et_level) {
+            setupLevel();
+            Log.i("addEvent", "** Select Level.");
         }
+    }
+
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        // 防止 java 操作 switchCompat 时触发监听器，再次弹出选择窗口
+        if (!buttonView.isPressed()) {
+            return;
+        }
+        if (buttonView.getId() == R.id.switch_date) {
+            if (isChecked) {
+                setupDate();
+            } else {
+                etDate.setText("");
+                finalDate = "";
+            }
+        } else if (buttonView.getId() == R.id.switch_time) {
+            if (isChecked) {
+                setupTime();
+            } else {
+                etTime.setText("");
+                finalTime = "";
+            }
+        } else if (buttonView.getId() == R.id.switch_level) {
+            if (isChecked) {
+                setupLevel();
+            } else {
+                etLevel.setText("");
+                finalLevel = -1;
+            }
+        }
+    }
+
+    private void setupLevel() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.add_level, null);
+        View titleView = inflater.inflate(R.layout.add_title, null);
+        TextView title = titleView.findViewById(R.id.dialog_title);
+        title.setText("Choose Priority");
+        RatingBar ratingBar = view.findViewById(R.id.add_rating);
+        builder.setCustomTitle(titleView);
+        builder.setView(view);
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            if (switchLevel.isChecked() && etLevel.getText().toString().length() == 0) {
+                switchLevel.setChecked(false);
+            }
+        });
+        builder.setPositiveButton("Submit", (dialog, which) -> {
+            float rating = ratingBar.getRating();
+            etLevel.setText(rating + "");
+            switchLevel.setChecked(true);
+            finalLevel = rating;
+        });
+        builder.create().show();
     }
 
     @SuppressLint("SetTextI18n")
@@ -162,12 +224,10 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
             int min = timePicker.getMinute();
             finalTime = hour + ":" + min;
 
-            String am_pm;
+            String am_pm = "AM";
             if (hour > 12) {
                 am_pm = "PM";
                 hour = hour - 12;
-            } else {
-                am_pm = "AM";
             }
             etTime.setText(hour + ":" + min + " " + am_pm);
             switchTime.setChecked(true);
@@ -200,6 +260,7 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
             etDate.setText(sdf.format(cal.getTime()));
+            finalDate = sdf.format(cal.getTime());
 
             switchDate.setChecked(true);
         });
@@ -208,38 +269,4 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
     }
 
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (buttonView.getId() == R.id.switch_date) {
-            if (isChecked) {
-                setupDate();
-            } else {
-                etDate.setText("");
-            }
-        } else if (buttonView.getId() == R.id.switch_time) {
-            if (isChecked) {
-                setupTime();
-            } else {
-                etTime.setText("");
-            }
-//        } else if (buttonView.getId() == R.id.switch_location) {
-//            if (isChecked) {
-//                setupLocation();
-//            } else {
-//                etLocation.setText("");
-//            }
-//        } else if (buttonView.getId() == R.id.switch_share) {
-//            if (isChecked) {
-//                setupShare();
-//            } else {
-//                etShare.setText("");
-//            }
-//        } else if (buttonView.getId() == R.id.switch_level) {
-//            if (isChecked) {
-//                setupLevel();
-//            } else {
-//                etLevel.setText("");
-//            }
-        }
-    }
 }

@@ -6,7 +6,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.example.mytodolist.entity.User;
+
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * @program: MyToDoList
@@ -46,6 +49,15 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
 
         // 执行创建语句
         db.execSQL(sql);
+
+        // 插入 记录 当前登录用户的phone 的数据条
+        // insert an data which tells who's using the account
+        ContentValues admin = new ContentValues();
+        admin.put(BaseColumns._ID, 0);
+        admin.put(UserDB.phone, "");
+        admin.put(UserDB.name, "phoneNow");
+        db.insert(UserDB.TableName, null, admin);
+
         Log.i("create", "** User Table Created **");
     }
 
@@ -72,34 +84,6 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
         db.close();
     }
 
-    // 删除用户
-    public static void deleteUser(MyDatabaseHelper dbHelper, int _id) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        // 此处要求删除User._id为传入参数_id的对应记录,使游标指向此记录
-        db.delete(
-                UserDB.TableName,                  // 操作的表名
-                UserDB._id + "=?",    // 删除的条件  wehere "_id" = _id
-                new String[]{_id + ""}           // 条件中“？”对应的值
-        );
-        db.close();
-    }
-
-    // 修改用户 by phone
-    public static void updateUser(MyDatabaseHelper dbHelper, String phoneNumber, ContentValues infoValues) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        // 根据phoneNumber修改对应的记录, 所要修改的内容保存在传入参数infoValues中
-        db.update(
-                UserDB.TableName,
-                infoValues,
-                UserDB.phone + " =? ",
-                new String[]{phoneNumber + ""}
-        );
-        Log.i("update", "** user: " + phoneNumber + " updated **");
-        db.close();
-    }
-
     // 修改用户 by id
     public static void updateUser(MyDatabaseHelper dbHelper, int id, ContentValues infoValues) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -115,52 +99,62 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
         db.close();
     }
 
-    // 查询用户 by id
-    public static HashMap<String, Object> getUser(MyDatabaseHelper dbHelper, int _id) {
+    // 查询用户 by phone
+    public static User getUser(MyDatabaseHelper dbHelper, String phone) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        HashMap<String, Object> userMap = new HashMap<>();
-        // 此处要求查询 User._id
-        Cursor cursor = db.query(UserDB.TableName, null, UserDB._id + " =? ", new String[]{_id + ""}, null, null, null);
-        // 移动到第一个结果上
-        cursor.moveToFirst();
-        // 获得每个字段的值
-        userMap.put(UserDB.phone, cursor.getString(cursor.getColumnIndex(UserDB.phone)));
-        userMap.put(UserDB.pwd, cursor.getString(cursor.getColumnIndex(UserDB.pwd)));
-        userMap.put(UserDB.name, cursor.getString(cursor.getColumnIndex(UserDB.name)));
-        userMap.put(UserDB.email, cursor.getString(cursor.getColumnIndex(UserDB.email)));
-        userMap.put(UserDB.birth, cursor.getString(cursor.getColumnIndex(UserDB.birth)));
+        // 此处要求查询 User.phone
+        Cursor cursor = db.query(UserDB.TableName, null, UserDB.phone + " =? ", new String[]{phone}, null, null, null);
 
-        // 如果需要遍历
-//        for(cursor.moveToFirst(); cursor.isAfterLast(); cursor.moveToNext()){
-//
-//        }
+        // 移到第一个
+        cursor.moveToFirst();
+
+        User user = new User();
+        do {
+            if (Objects.equals(cursor.getString(cursor.getColumnIndex(UserDB.phone)), phone) && cursor.getInt(cursor.getColumnIndex(BaseColumns._ID)) != 0)
+                user.set_id(cursor.getInt(cursor.getColumnIndex(BaseColumns._ID)));
+            user.setPhone(cursor.getString(cursor.getColumnIndex(UserDB.phone)));
+            user.setName(cursor.getString(cursor.getColumnIndex(UserDB.name)));
+            user.setPwd(cursor.getString(cursor.getColumnIndex(UserDB.pwd)));
+            user.setEmail(cursor.getString(cursor.getColumnIndex(UserDB.email)));
+            user.setBirth(cursor.getString(cursor.getColumnIndex(UserDB.birth)));
+        } while (cursor.moveToNext());
 
         cursor.close();
         db.close();
-        return userMap;
+
+        return user;
     }
 
-    // 查询用户 by phone
-    public static HashMap<String, Object> getUser(MyDatabaseHelper dbHelper, String phone) {
+    public static String getPhone(MyDatabaseHelper dbHelper, int _id) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        HashMap<String, Object> userMap = new HashMap<>();
-        // 此处要求查询 User.phone
-        Cursor cursor = db.query(UserDB.TableName, null, UserDB.phone + " =? ", new String[]{phone + ""}, null, null, null);
-        // 移动到第一个结果上
+        Cursor cursor = db.query(UserDB.TableName, null, UserDB._id + " =? ", new String[]{_id + ""}, null, null, null);
         cursor.moveToFirst();
-        // 获得每个字段的值
-        userMap.put(UserDB._id, cursor.getString(cursor.getColumnIndex(UserDB._id)));
-        userMap.put(UserDB.phone, cursor.getString(cursor.getColumnIndex(UserDB.phone)));
-        userMap.put(UserDB.pwd, cursor.getString(cursor.getColumnIndex(UserDB.pwd)));
-        userMap.put(UserDB.name, cursor.getString(cursor.getColumnIndex(UserDB.name)));
-        userMap.put(UserDB.email, cursor.getString(cursor.getColumnIndex(UserDB.email)));
-        userMap.put(UserDB.birth, cursor.getString(cursor.getColumnIndex(UserDB.birth)));
+        String phoneGet  = cursor.getString(cursor.getColumnIndex(UserDB.phone));
 
         cursor.close();
         db.close();
-        return userMap;
+
+        return phoneGet;
+    }
+
+    public static String getName(MyDatabaseHelper dbHelper, String phone) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(UserDB.TableName, null, UserDB.phone + " =? ", new String[]{phone}, null, null, null);
+        int idGet = -1;
+        String nameGet = "null";
+        cursor.moveToFirst();
+        do {
+            idGet = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
+            nameGet = cursor.getString(cursor.getColumnIndex(UserDB.name));
+            if (idGet != 0 && idGet != -1) break;
+        } while (cursor.moveToNext());
+
+        cursor.close();
+        db.close();
+        return nameGet;
     }
 
     // 查重
@@ -194,7 +188,7 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
      * */
     public static int login(MyDatabaseHelper dbHelper, String phone, String password) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        int ret;
+        int ret = -2;
         Cursor cursor = db.query(
                 UserDB.TableName,
                 null,
@@ -209,19 +203,26 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
             ret = -1;
         } else {
             cursor.moveToFirst();
-            String pwd = cursor.getString(cursor.getColumnIndex(UserDB.pwd));
-            if (pwd.equals(password)) {
-                Log.i("Login", "** All Correct. Log In Successfully.");
-                ret = 1;
-            } else {
-                Log.i("Login", "** Password Wrong.");
-                ret = 0;
-            }
+//            do {
+                int idGet = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
+                if (idGet != 0) {
+                    String pwd = cursor.getString(cursor.getColumnIndex(UserDB.pwd));
+                    if (pwd.equals(password)) {
+                        Log.i("Login", "** All Correct. Log In Successfully.");
+                        ret = 1;
+                    } else {
+                        Log.i("Login", "** Password Wrong.");
+                        ret = 0;
+                    }
+//                    break;
+                }
+//            } while (cursor.moveToNext());
         }
 
         cursor.close();
         db.close();
         return ret;
     }
+
 
 }

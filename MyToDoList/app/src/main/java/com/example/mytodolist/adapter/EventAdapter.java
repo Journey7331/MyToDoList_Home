@@ -1,9 +1,7 @@
 package com.example.mytodolist.adapter;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,19 +19,25 @@ import androidx.fragment.app.Fragment;
 import com.example.mytodolist.R;
 import com.example.mytodolist.database.EventDB;
 import com.example.mytodolist.database.MyDatabaseHelper;
-import com.example.mytodolist.entity.AddressEvent;
+import com.example.mytodolist.entity.Event;
 import com.example.mytodolist.main.EditFragment;
 
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * @program: MyToDoList
- * @description:
+ * @description: EventAdapter
  */
 public class EventAdapter extends ArrayAdapter {
 
     LayoutInflater inflater;
-    ArrayList<AddressEvent> arrayList;
+    ArrayList<Event> arrayList;
     Activity ctx;
     MyDatabaseHelper mysql = new MyDatabaseHelper(getContext());
 
@@ -44,7 +48,7 @@ public class EventAdapter extends ArrayAdapter {
         TextView tvDate;
     }
 
-    public EventAdapter(Activity context, ArrayList<AddressEvent> arr) {
+    public EventAdapter(Activity context, ArrayList<Event> arr) {
         super(context, R.layout.fragment_home, arr);
         this.ctx = context;
         this.arrayList = arr;
@@ -58,7 +62,7 @@ public class EventAdapter extends ArrayAdapter {
 
     @Nullable
     @Override
-    public AddressEvent getItem(int position) {
+    public Event getItem(int position) {
         return arrayList.get(position);
     }
 
@@ -67,7 +71,6 @@ public class EventAdapter extends ArrayAdapter {
         return position;
     }
 
-    @SuppressLint("SetTextI18n")
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -78,37 +81,81 @@ public class EventAdapter extends ArrayAdapter {
             viewHolder = new EventItemHolder();
             viewHolder.tvContent = convertView.findViewById(R.id.tv_content);
             viewHolder.cbIsDone = convertView.findViewById(R.id.cb_is_done);
+            viewHolder.tvDate = convertView.findViewById(R.id.tv_date);
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (EventItemHolder) convertView.getTag();
         }
 
+        // init content & state
+        viewHolder.tvContent.setText(arrayList.get(position).getContent());
+        viewHolder.cbIsDone.setChecked(arrayList.get(position).isDone());
 
-        viewHolder.tvContent.setText(arrayList.get(position).getEvent().getContent());
-        viewHolder.cbIsDone.setChecked(arrayList.get(position).getEvent().isDone());
+        // init datetime
+        String date = arrayList.get(position).getDate();
+        String time = arrayList.get(position).getTime();
 
+        if (!"".equals(date)) {
+            long dateParse = 0;
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+                dateParse = sdf.parse(date).getTime();
+                if (!"".equals(time)) {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm", Locale.CHINA);
+                    dateParse += simpleDateFormat.parse(time).getTime();
+                    dateParse += 8 * 60 * 60 * 1000;        // 转化 time 需要加上 8 hours
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            long nowtime = new Date().getTime();
+            if (nowtime > dateParse) {
+                String calc = DateCalc(nowtime, dateParse);
+                // Today but no exact Time
+                if (calc.contains("H") && "".equals(time)) {
+                    viewHolder.tvDate.setText("Today");
+                }else {
+                    viewHolder.tvDate.setTextColor(0xffDE3143);
+                    viewHolder.tvDate.setText(calc);
+                }
+            } else if (nowtime < dateParse) {
+                viewHolder.tvDate.setText(DateCalc(dateParse,nowtime));
+            }
+        }
+
+        // CheckBox
         viewHolder.cbIsDone.setOnClickListener(v -> {
-            boolean status = viewHolder.cbIsDone.isChecked();
-            Toast.makeText(getContext(), status + "", Toast.LENGTH_SHORT).show();
             // Set Event Done
-            ContentValues values = new ContentValues();
-            values.put(EventDB.content, arrayList.get(position).getEvent().getContent());
-            values.put(EventDB.done, status + "");
-            EventDB.updateEventById(mysql,arrayList.get(position).getEvent().get_id() + "", values);
+            boolean status = viewHolder.cbIsDone.isChecked();
+            arrayList.get(position).setDone(status);
+            EventDB.updateEventDoneState(mysql, arrayList.get(position).get_id() + "", status);
+//            Toast.makeText(getContext(), status + "", Toast.LENGTH_SHORT).show();
+        });
+
+        // Click to get detail
+        convertView.setOnClickListener(v -> {
+            String memo = getItem(position).getMemo();
+            if (!"".equals(memo)) {
+                Toast.makeText(getContext(), memo, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "No More Detail.", Toast.LENGTH_SHORT).show();
+            }
         });
 
         // LongPress
         convertView.setOnLongClickListener(v -> {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
-            View titleView = inflater.inflate(R.layout.add_level_title, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+            View titleView = inflater.inflate(R.layout.add_title, null);
             TextView title = titleView.findViewById(R.id.dialog_title);
-            title.setText("Modify / Delete");
+            title.setText("Delete / Modify");
             builder.setCustomTitle(titleView);
 
             // Modify
             builder.setPositiveButton("Modify", (dialog, which) -> {
                 Fragment editFragment = new EditFragment(getItem(position));
+                // Fragment 之间的跳转
                 ((AppCompatActivity) ctx).getSupportFragmentManager().beginTransaction().setCustomAnimations(
                         R.anim.slide_in,
                         R.anim.fade_out,
@@ -119,9 +166,18 @@ public class EventAdapter extends ArrayAdapter {
 
             // Delete
             builder.setNegativeButton("Delete", (dialog, which) -> {
-                EventDB.deleteEventById(mysql,(getItem(position)).getEvent().get_id() + "");
+                EventDB.deleteEventById(mysql, (getItem(position)).get_id() + "");
                 remove(getItem(position));
                 notifyDataSetChanged();
+
+                // Done
+                // TODO: 不下拉就可以更新 emptyPage 的 VISIBLE 状态
+                //  update the VISIBLE state of the EmptyPage without pulling
+                if (arrayList.size() < 1) {
+                    ctx.findViewById(R.id.home_list).setVisibility(View.INVISIBLE);
+                    ctx.findViewById(R.id.empty_status).setVisibility(View.VISIBLE);
+                }
+
                 Toast.makeText(getContext(), "Delete Successful", Toast.LENGTH_SHORT).show();
             });
 
@@ -131,7 +187,28 @@ public class EventAdapter extends ArrayAdapter {
             builder.create().show();
             return true;
         });
+
         return convertView;
     }
+
+    // Calculate how much time left
+    // Not Very Correctly Calculate
+    private String DateCalc(long late, long early) {
+        long diff = late - early;
+        // Day
+        long days = diff / (1000 * 60 * 60 * 24);
+        if (days != 0) return days + "D";
+        // Hour
+        long hours = (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+        if (hours != 0) return hours + "H";
+        // Min
+        long minutes = (diff % (1000 * 60 * 60)) / (1000 * 60);
+        if (minutes != 0) return minutes + "M";
+        // Sec
+        long seconds = (diff % (1000 * 60)) / 1000;
+        if (seconds < 5) return "Now";
+        else return "1M";
+    }
+
 
 }

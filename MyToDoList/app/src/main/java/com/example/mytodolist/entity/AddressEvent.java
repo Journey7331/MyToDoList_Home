@@ -4,8 +4,11 @@ import android.location.Address;
 
 /**
  * @program: MyToDoList
- * @description:
+ * @description: Event with address
  */
+
+// TODO Event with address
+// Add MapFragment
 public class AddressEvent implements Comparable{
     Event event;
     Address address;

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".main.RegisterActivity2">
+    android:layout_height="match_parent">
 
     <View
         android:id="@+id/ellipse_1"
@@ -106,7 +104,7 @@
             android:text="@string/register_submit"
             android:textStyle="bold"
             android:layout_centerHorizontal="true"
-            android:background="@drawable/login_button"/>
+            android:background="@drawable/button"/>
 
         <TextView
             android:id="@+id/btn_register_back"

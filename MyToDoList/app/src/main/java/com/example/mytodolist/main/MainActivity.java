@@ -1,40 +1,56 @@
 package com.example.mytodolist.main;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.mytodolist.R;
 import com.example.mytodolist.base.BaseActivity;
+import com.example.mytodolist.base.BaseFragment;
+import com.example.mytodolist.database.MyDatabaseHelper;
+import com.example.mytodolist.database.UserDB;
+import com.example.mytodolist.entity.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.HashMap;
+import java.util.Objects;
 
 public class MainActivity extends BaseActivity {
     BottomNavigationView bottomNavigation;
 
     AddFragment addFragment;
     HomeFragment homeFragment;
-//    MapFragment mapFragment;
-//    NotificationFragment notificationFragment;
-//    MyPageFragment myPageFragment;
-
+    FocusFragment focusFragment;
+    MyPageFragment myPageFragment;
     Fragment currentFragment;
+
+    private long exitTime = 0;
+
+    User user;
+    MyDatabaseHelper mysql = new MyDatabaseHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // check log in status
+        String phone = UserDB.getPhone(mysql, 0);
+        if ("".equals(phone)) {
+            this.user = new User(0, "");
+        } else {
+            this.user = UserDB.getUser(mysql, phone);
+        }
+
         // fragment setup
         addFragment = new AddFragment();
         homeFragment = new HomeFragment();
-//        mapFragment = new MapFragment();
-//        notificationFragment = new NotificationFragment();
-//        myPageFragment = new MyPageFragment();
+        focusFragment = new FocusFragment();
+        myPageFragment = new MyPageFragment(this.user);
         currentFragment = null;
 
         getSupportFragmentManager()
@@ -47,6 +63,22 @@ public class MainActivity extends BaseActivity {
         bottomNavigation.setItemIconTintList(null);
         bottomNavigation.setOnNavigationItemSelectedListener(bottomNavigationSelectedListener);
 
+    }
+
+    // Press Again to Exit
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if ((System.currentTimeMillis() - exitTime > 3000)) {
+                Toast.makeText(getApplicationContext(), "Press Again to Exit", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener bottomNavigationSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -80,22 +112,21 @@ public class MainActivity extends BaseActivity {
                 homeFragment = new HomeFragment();
                 currentFragment = homeFragment;
                 break;
-//            case 2:
-//                mapFragment = new MapFragment();
-//                currentFragment = mapFragment;
-//                break;
+            case 2:
+                Toast.makeText(this, "MapFragment is developing...", Toast.LENGTH_SHORT).show();
+                break;
             case 3:
                 addFragment = new AddFragment();
                 currentFragment = addFragment;
                 break;
-//            case 4:
-//                notificationFragment = new NotificationFragment();
-//                currentFragment = notificationFragment;
-//                break;
-//            case 5:
-//                myPageFragment = new MyPageFragment();
-//                currentFragment = myPageFragment;
-//                break;
+            case 4:
+                focusFragment = new FocusFragment();
+                currentFragment = focusFragment;
+                break;
+            case 5:
+                myPageFragment = new MyPageFragment(user);
+                currentFragment = myPageFragment;
+                break;
 
         }
         getSupportFragmentManager()

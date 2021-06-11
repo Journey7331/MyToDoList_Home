@@ -6,11 +6,29 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+/*
+* version
+* 1: Base Tables
+* User:     _id | phone | password | name | email | birthday
+* Event:    _id | content | done
+*
+* 2:
+* Event:    Add memo | date | time
+*
+* 3:
+* Event:    Add level
+*
+* 4:
+* User:     Automatically authenticates logged accounts
+*
+* */
+
+
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     // 数据库名
     private static final String db_name = "test";
-    private static final int version = 1;
+    private static final int version = 4;
 
     /**
      * 构造方法，创建数据库
@@ -32,7 +50,6 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion);
     }
-
 
     // 在创建数据库的时候onCreate会被调用，所以数据库创建之后，表会被创建且仅创建一次
     @Override

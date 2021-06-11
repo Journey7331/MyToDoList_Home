@@ -7,17 +7,22 @@ public class User {
     private String name;
     private String email;
     private String birth;
-    static String phoneNow = ""; //当前登录的用户
 
     public User() {
     }
 
-    public static String getPhoneNow() {
-        return phoneNow;
+    public User(int _id, String phone) {
+        this._id = _id;
+        this.phone = phone;
     }
 
-    public static void setPhoneNow(String phoneNow) {
-        User.phoneNow = phoneNow;
+    public User(int _id, String phone, String pwd, String name, String email, String birth) {
+        this._id = _id;
+        this.phone = phone;
+        this.pwd = pwd;
+        this.name = name;
+        this.email = email;
+        this.birth = birth;
     }
 
     public int get_id() {

@@ -1,20 +1,19 @@
 package com.example.mytodolist.entity;
 
-import java.util.Date;
-
 /**
  * @program: MyToDoList
  * @description: Event 类
  */
-public class Event {
+public class Event implements Comparable {
     private int _id;
     private String content;
     private String memo;
     private boolean done;
     private String date;
     private String time;
+    private float level;
+    // TODO Add type
 //    private String type;
-
 
     public Event() {
         this._id = 0;
@@ -78,13 +77,18 @@ public class Event {
         this.date = date;
     }
 
-    @Override
-    public String toString() {
-        return "Event{" +
-                "_id='" + _id + '\'' +
-                ", content='" + content + '\'' +
-                ", done=" + done +
-                ", date=" + date +
-                '}';
+    public float getLevel() {
+        return level;
+    }
+
+    public void setLevel(float level) {
+        this.level = level;
+    }
+
+        @Override
+    public int compareTo(Object o) {
+        int id =  ((Event)o).get_id();
+        /* For Ascending order*/
+        return this.get_id() - id;
     }
 }

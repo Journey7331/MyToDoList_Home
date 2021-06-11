@@ -3,11 +3,9 @@ package com.example.mytodolist.base;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.mytodolist.base.BaseActivity;
-
 /**
  * @program: MyToDoList
- * @description:
+ * @description: BaseRegisterActivity
  */
 public class BaseRegisterActivity extends BaseActivity {
 
@@ -44,16 +42,16 @@ public class BaseRegisterActivity extends BaseActivity {
             name.setText("");
             name.requestFocus();
             return false;
-//        } else if (checkEditTextEmpty(birth)) {
-//            Toast.makeText(this, "Choose Your Birthday.", Toast.LENGTH_SHORT).show();
-//            birth.setText("");
-//            birth.requestFocus();
-//            return false;
-//        } else if (checkEditTextEmpty(email)) {
-//            Toast.makeText(this, "Enter Your Email.", Toast.LENGTH_SHORT).show();
-//            email.setText("");
-//            email.requestFocus();
-//            return false;
+        } else if (checkEditTextEmpty(birth)) {
+            Toast.makeText(this, "Choose Your Birthday.", Toast.LENGTH_SHORT).show();
+            birth.setText("");
+            birth.requestFocus();
+            return false;
+        } else if (checkEditTextEmpty(email)) {
+            Toast.makeText(this, "Enter Your Email.", Toast.LENGTH_SHORT).show();
+            email.setText("");
+            email.requestFocus();
+            return false;
         } else {
             return true;
         }

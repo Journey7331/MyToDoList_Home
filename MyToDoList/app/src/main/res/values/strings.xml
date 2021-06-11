@@ -6,9 +6,9 @@
     <string name="registerRecommend2"> now!</string>
 
     <string name="text_label_1">HOME</string>
-    <string name="text_label_2">지도</string>
-    <string name="text_label_3">더하기</string>
-    <string name="text_label_4">Notification</string>
+    <string name="text_label_2">Map</string>
+    <string name="text_label_3">Add</string>
+    <string name="text_label_4">CountDown</string>
     <string name="text_label_5">Profile</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -23,7 +23,6 @@
     <string name="register_submit">Submit</string>
     <string name="register_back">Back</string>
     <string name="register_name">Name</string>
-    <string name="search_nickname">Nikename</string>
     <string name="add_content">TO DO WHAT</string>
     <string name="add_memo">MEMO</string>
     <string name="add_date">DATE</string>
@@ -34,22 +33,17 @@
 
     <string name="logo_play">HELLO</string>
 
+    <string name="sort_add_time">Sort by Add-Time</string>
+    <string name="sort_date">Sort by Date</string>
+    <string name="sort_undone">Hide UnDone Event</string>
+    <string name="sort_done">Hide Done Event</string>
+    <string name="sort_prior">Sort by Priority</string>
 
-    <string-array name="filter_spinner">
-        <item>등록 순</item>
-        <item>다 된 일 숨기기</item>
-        <item>내가 할 일</item>
-        <item>공유 된 일</item>
-        <item>시간 순</item>
-        <item>중요도</item>
-    </string-array>
+<!--    <string-array name="filter_spinner">-->
+<!--        <item>Sort by Add-Time</item>-->
+<!--        <item>Sort by Date</item>-->
+<!--        <item>Hide Done Event</item>-->
+<!--        <item>Sort by Priority</item>-->
+<!--    </string-array>-->
 
-    <string-array name="my_page_setting">
-        <item>설정</item>
-        <item>로그아웃</item>
-    </string-array>
-
-    <string-array name="friend_setting">
-        <item>친구 끊기</item>
-    </string-array>
 </resources>

@@ -1,14 +1,20 @@
 package com.example.mytodolist.main;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,28 +25,29 @@ import com.example.mytodolist.R;
 import com.example.mytodolist.base.BaseFragment;
 import com.example.mytodolist.database.EventDB;
 import com.example.mytodolist.database.MyDatabaseHelper;
-import com.example.mytodolist.entity.Address;
-import com.example.mytodolist.entity.AddressEvent;
+import com.example.mytodolist.entity.Event;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * @program: MyToDoList
- * @description:
+ * @description: EditFragment
  */
-public class EditFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemClickListener {
+public class EditFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     EditText etContent, etMemo, etDate, etTime, etLocation, etShare, etLevel;
-    SwitchCompat switchDate, switchTime, switchLocation, switchShare, switchLevel;
-
-    Button btnSubmit;
+    SwitchCompat switchDate, switchTime, switchLevel;
+    Button tvBack, btnSubmit;
 
     String finalDate, finalTime;
-    Address finalLocation;
-    String finalShare;
-    String finalLevel;
+    float finalLevel;
 
-    AddressEvent event;
+    Event event;
 
-    public EditFragment(AddressEvent event) {
+    public EditFragment(Event event) {
         this.event = event;
     }
 
@@ -50,9 +57,7 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
         View v = inflater.inflate(R.layout.fragment_edit, container, false);
 
         init(v);
-
-        etContent.setText(event.getEvent().getContent());
-        etMemo.setText(event.getEvent().getMemo());
+        setUpEvent();
 
         // 聚焦content
         etContent.requestFocus();
@@ -62,7 +67,6 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
     private void init(View view) {
         etContent = view.findViewById(R.id.et_content);
         etMemo = view.findViewById(R.id.et_memo);
-
         etDate = view.findViewById(R.id.et_date);
         etTime = view.findViewById(R.id.et_time);
         etLocation = view.findViewById(R.id.et_location);
@@ -71,42 +75,57 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
 
         switchDate = view.findViewById(R.id.switch_date);
         switchTime = view.findViewById(R.id.switch_time);
-        switchLocation = view.findViewById(R.id.switch_location);
-        switchShare = view.findViewById(R.id.switch_share);
         switchLevel = view.findViewById(R.id.switch_level);
 
-        finalDate = "";
-        finalTime = "";
-        finalLocation = new Address();
-        finalShare = "";
-        finalLevel = "";
-
         btnSubmit = view.findViewById(R.id.btn_submit);
+        tvBack = view.findViewById(R.id.edit_back);
 
         etDate.setOnClickListener(this);
         etTime.setOnClickListener(this);
-//        etLocation.setOnClickListener(this);
-//        etShare.setOnClickListener(this);
-//        etLevel.setOnClickListener(this);
+        etLevel.setOnClickListener(this);
+        tvBack.setOnClickListener(this);
 
         switchDate.setOnCheckedChangeListener(this);
         switchTime.setOnCheckedChangeListener(this);
-//        switchLocation.setOnCheckedChangeListener(this);
-//        switchShare.setOnCheckedChangeListener(this);
-//        switchLevel.setOnCheckedChangeListener(this);
+        switchLevel.setOnCheckedChangeListener(this);
 
-        btnSubmit.setOnClickListener(v -> {
+        btnSubmit.setOnClickListener(l -> {
             if (etContent.length() == 0) {
                 Toast.makeText(getContext(), "Please Add Something.", Toast.LENGTH_SHORT).show();
                 etContent.requestFocus();
             } else if (etDate.length() == 0 && etTime.length() > 0) {
                 Toast.makeText(getContext(), "Please Set A DDL.", Toast.LENGTH_SHORT).show();
+                // 因为避免了【初始化的时候触发监听器】，这里修改并不会调用 onCheckedChanged
                 switchDate.setChecked(true);
+                // 模拟点击 View
+                etDate.performClick();
                 etDate.requestFocus();
             } else {
                 editItem();
+                ((BottomNavigationView) getActivity().findViewById(R.id.bottom_navigation)).setSelectedItemId(R.id.page_1);
             }
         });
+    }
+
+    private void setUpEvent() {
+        etContent.setText(event.getContent());
+        etMemo.setText(event.getMemo());
+        finalDate = event.getDate();
+        finalTime = event.getTime();
+        finalLevel = event.getLevel();
+
+        if (finalDate.length() > 0) {
+            etDate.setText(finalDate);
+            switchDate.setChecked(true);
+        }
+        if (finalTime.length() > 0) {
+            etTime.setText(finalTime);
+            switchTime.setChecked(true);
+        }
+        if (finalLevel > 0) {
+            etLevel.setText(finalLevel + "");
+            switchLevel.setChecked(true);
+        }
     }
 
     private void editItem() {
@@ -115,10 +134,13 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
         values.put(EventDB.memo, etMemo.getText().toString());
         values.put(EventDB.date, finalDate);
         values.put(EventDB.time, finalTime);
+        values.put(EventDB.level, finalLevel);
 
         //TODO Put Location
+
         MyDatabaseHelper mysql = new MyDatabaseHelper(getContext());
-        EventDB.updateEventById(mysql, event.getEvent().get_id() + "", values);
+        EventDB.updateEventById(mysql, event.get_id() + "", values);
+        Toast.makeText(getContext(), "Successfully Edited!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -127,43 +149,140 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
             setupDate();
         } else if (v.getId() == R.id.et_time) {
             setupTime();
-        } else if (v.getId() == R.id.et_location) {
-            setupLocation();
-//        } else if (v.getId() == R.id.et_share) {
-//            setupShare();
-//        } else if (v.getId() == R.id.et_level) {
-//            setupLevel();
+        } else if (v.getId() == R.id.et_level) {
+            setupLevel();
+        } else if (v.getId() == R.id.edit_back) {
+            //            getActivity().onBackPressed();
+//            getActivity().getSupportFragmentManager().popBackStack();
+            Toast.makeText(getContext(), "back", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void setupLocation() {
-    }
-
-    private void setupTime() {
-    }
-
-    private void setupDate() {
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        // 防止初始化的时候触发监听器
+        if (!buttonView.isPressed()) {
+            return;
+        }
+
         if (buttonView.getId() == R.id.switch_date) {
             if (isChecked) {
                 setupDate();
             } else {
                 etDate.setText("");
+                finalDate = "";
             }
         } else if (buttonView.getId() == R.id.switch_time) {
             if (isChecked) {
                 setupTime();
             } else {
                 etTime.setText("");
+                finalTime = "";
+            }
+        } else if (buttonView.getId() == R.id.switch_level) {
+            if (isChecked) {
+                setupLevel();
+            } else {
+                etLevel.setText("");
+                finalLevel = -1;
             }
         }
     }
+
+    private void setupLevel() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.add_level, null);
+        View titleView = inflater.inflate(R.layout.add_title, null);
+        TextView title = titleView.findViewById(R.id.dialog_title);
+        title.setText("Choose Priority");
+        RatingBar ratingBar = view.findViewById(R.id.add_rating);
+        builder.setCustomTitle(titleView);
+        builder.setView(view);
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (switchLevel.isChecked() && etLevel.getText().toString().length() == 0) {
+                    switchLevel.setChecked(false);
+                }
+            }
+        });
+
+        builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                float rating = ratingBar.getRating();
+                etLevel.setText(rating + "");
+                switchLevel.setChecked(true);
+                finalLevel = rating;
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void setupTime() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.add_time, null);
+        TimePicker timePicker = view.findViewById(R.id.add_time_picker);
+        timePicker.setIs24HourView(true);
+        builder.setView(view);
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> {
+            if (switchTime.isChecked() && etTime.getText().toString().length() == 0) {
+                switchTime.setChecked(false);
+            }
+        });
+        builder.setPositiveButton("Submit", (dialog, which) -> {
+            int hour = timePicker.getHour();
+            int min = timePicker.getMinute();
+            finalTime = hour + ":" + min;
+
+            String am_pm = "AM";
+            if (hour > 12) {
+                am_pm = "PM";
+                hour = hour - 12;
+            }
+            etTime.setText(hour + ":" + min + " " + am_pm);
+            switchTime.setChecked(true);
+        });
+
+        builder.create().show();
+    }
+
+    private void setupDate() {
+        Calendar cal = Calendar.getInstance();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.add_date, null);
+        DatePicker datePicker = view.findViewById(R.id.add_date_picker);
+        builder.setView(view);
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (switchDate.isChecked() && etDate.getText().toString().length() == 0) {
+                    switchDate.setChecked(false);
+                }
+            }
+        });
+
+        builder.setPositiveButton("Submit", (dialog, which) -> {
+            cal.set(Calendar.YEAR, datePicker.getYear());
+            cal.set(Calendar.MONTH, datePicker.getMonth());
+            cal.set(Calendar.DAY_OF_MONTH, datePicker.getDayOfMonth());
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+            etDate.setText(sdf.format(cal.getTime()));
+            finalDate = sdf.format(cal.getTime());
+
+            switchDate.setChecked(true);
+        });
+
+        builder.create().show();
+    }
+
+
 }
