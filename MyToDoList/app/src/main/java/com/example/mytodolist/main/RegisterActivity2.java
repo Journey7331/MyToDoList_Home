@@ -69,7 +69,7 @@ public class RegisterActivity2 extends BaseRegisterActivity implements View.OnCl
     public void onClick(View v) {
         if (v.getId() == R.id.et_registerBirth) {
             builder = new AlertDialog.Builder(this);
-            // 布局服务
+            // inflater
             LayoutInflater inflater = getLayoutInflater();
             final View view = inflater.inflate(R.layout.register_date, null);
             final DatePicker datePicker = view.findViewById(R.id.register_date_picker);

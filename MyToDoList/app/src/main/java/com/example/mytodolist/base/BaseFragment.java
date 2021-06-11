@@ -6,6 +6,10 @@ import android.view.inputmethod.InputMethodManager;
 
 import androidx.fragment.app.Fragment;
 
+/**
+ * @program: MyToDoList
+ * @description: BaseFragment
+ */
 public class BaseFragment extends Fragment {
 
     public void hideKeyboard(Activity activity) {

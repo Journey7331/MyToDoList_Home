@@ -16,6 +16,10 @@ import com.example.mytodolist.database.MyDatabaseHelper;
 import com.example.mytodolist.database.UserDB;
 import com.example.mytodolist.entity.User;
 
+/**
+ * @program: MyToDoList
+ * @description: LoginActivity
+ */
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     EditText et_username, et_password;
@@ -46,8 +50,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         // Done
         // TODO: 查看数据库中上次登录的用户有没有登出，如果没有登出则自动登录
         // auto login
-
-        if (!UserDB.getPhone(mysql, 0).equals("")) {
+        if (!UserDB.getPhone(mysql).equals("")) {
             Log.i("login", "** auto Log in");
             startActivity(new Intent(this, MainActivity.class));
             finish();

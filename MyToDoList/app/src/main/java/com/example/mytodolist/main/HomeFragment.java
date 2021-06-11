@@ -58,12 +58,12 @@ public class HomeFragment extends BaseFragment implements CompoundButton.OnCheck
     TextView logoIcon;
     Button filterButton;
 
-//    SearchFragment searchFragment;
-
     RelativeLayout emptyPage;
     MyDatabaseHelper mysql;
+    String account_name;
 
-    public HomeFragment() {
+    public HomeFragment(String name) {
+        this.account_name = name;
     }
 
     // 获取数据并刷新
@@ -92,10 +92,8 @@ public class HomeFragment extends BaseFragment implements CompoundButton.OnCheck
         switchDone = view.findViewById(R.id.switch_done);
         emptyPage = view.findViewById(R.id.empty_status);
         switchDone.setChecked(true);
-//        searchFragment = new SearchFragment();
 
         refresh(arr);
-        checkEmpty(arr);
 
         setHello();
 
@@ -108,9 +106,7 @@ public class HomeFragment extends BaseFragment implements CompoundButton.OnCheck
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                switchDone.setChecked(true);
                 refresh(arr);
-                checkEmpty(arr);
                 SystemClock.sleep(200);
                 pullToRefresh.setRefreshing(false);
             }
@@ -126,7 +122,7 @@ public class HomeFragment extends BaseFragment implements CompoundButton.OnCheck
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        // 5 - 9
+            // 5 - 9
         if (5 <= hour && hour <= 9) {
             logoIcon.setText("Morning!");
             // 10 - 12
@@ -146,10 +142,8 @@ public class HomeFragment extends BaseFragment implements CompoundButton.OnCheck
             logoIcon.setText("MidNight~");
         }
 
-        String phone = UserDB.getPhone(mysql, 0);
-        if (phone != "") logoIcon.append(" " + UserDB.getName(mysql, phone) + ".");
+        if (!"".equals(account_name)) logoIcon.append(" " + account_name + ".");
         else logoIcon.append(" Stranger.");
-
     }
 
 
@@ -158,12 +152,12 @@ public class HomeFragment extends BaseFragment implements CompoundButton.OnCheck
         PopupMenu popupMenu = new PopupMenu(getContext(), view);
         popupMenu.getMenuInflater().inflate(R.menu.sort_event_menu, popupMenu.getMenu());
         popupMenu.setOnMenuItemClickListener(this);
-
         popupMenu.show();
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
+        switchDone.setChecked(true);
         switch (item.getItemId()) {
             case R.id.sort_1:
                 // Sort by add time
@@ -216,7 +210,6 @@ public class HomeFragment extends BaseFragment implements CompoundButton.OnCheck
                         if (resultTime > 0) return 1;
                         else if (resultTime < 0) return -1;
                         else return 0;
-
                     }
                 });
                 refresh(arr);
@@ -235,7 +228,18 @@ public class HomeFragment extends BaseFragment implements CompoundButton.OnCheck
                 });
                 refresh(arr);
                 break;
-
+            case R.id.sort_4:
+                filtered.clear();
+                for (Event event : arr) {
+                    if (event.isDone()) {
+                        filtered.add(event);
+                    }
+                }
+                refresh(filtered);
+                break;
+            case R.id.sort_5:
+                switchDone.setChecked(false);
+                break;
         }
         return false;
     }
@@ -251,10 +255,8 @@ public class HomeFragment extends BaseFragment implements CompoundButton.OnCheck
         menu.add(1, 4, 1, "Hide UnDone Event");
     }
 
-
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
         if (isChecked) {
             refresh(arr);
         } else {

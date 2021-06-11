@@ -31,17 +31,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+/**
+ * @program: MyToDoList
+ * @description: AddFragment
+ */
 public class AddFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
-    EditText etContent, etMemo, etDate, etTime, etLocation, etShare, etLevel;
-    SwitchCompat switchDate, switchTime, switchLocation, switchShare, switchLevel;
-
+    EditText etContent, etMemo, etDate, etTime, etLevel;
+    SwitchCompat switchDate, switchTime, switchLevel;
     Button btnSubmit;
 
     String finalDate, finalTime;
-
-    //    Address finalLocation;
-//    String finalShare;
     float finalLevel;
 
     public AddFragment() {
@@ -53,50 +53,37 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // 布局服务
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add, container, false);
         etContent = view.findViewById(R.id.et_content);
         etMemo = view.findViewById(R.id.et_memo);
         etDate = view.findViewById(R.id.et_date);
         etTime = view.findViewById(R.id.et_time);
-//        etLocation = view.findViewById(R.id.et_location);
-//        etShare = view.findViewById(R.id.et_share);
         etLevel = view.findViewById(R.id.et_level);
 
         switchDate = view.findViewById(R.id.switch_date);
         switchTime = view.findViewById(R.id.switch_time);
-//        switchLocation = view.findViewById(R.id.switch_location);
-//        switchShare = view.findViewById(R.id.switch_share);
         switchLevel = view.findViewById(R.id.switch_level);
 
         btnSubmit = view.findViewById(R.id.btn_submit);
 
         finalDate = "";
         finalTime = "";
-//        finalLocation = new Address();
-//        finalShare = "";
         finalLevel = -1;
 
         etDate.setOnClickListener(this);
         etTime.setOnClickListener(this);
-//        etLocation.setOnClickListener(this);
-//        etShare.setOnClickListener(this);
         etLevel.setOnClickListener(this);
 
         switchDate.setOnCheckedChangeListener(this);
         switchTime.setOnCheckedChangeListener(this);
-//        switchLocation.setOnCheckedChangeListener(this);
-//        switchShare.setOnCheckedChangeListener(this);
         switchLevel.setOnCheckedChangeListener(this);
-
 
         btnSubmit.setOnClickListener(v -> {
             hideKeyboard(getActivity());
             if (etContent.length() == 0) {
-                Toast.makeText(getContext(), "Tell Me What You Want To Do.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Tell Me What You Wanna Do.", Toast.LENGTH_SHORT).show();
                 etContent.requestFocus();
             } else if (etDate.length() == 0 && etTime.length() > 0) {
                 Toast.makeText(getContext(), "Choose A Day.", Toast.LENGTH_SHORT).show();
@@ -119,7 +106,6 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
         values.put(EventDB.date, finalDate);
         values.put(EventDB.time, finalTime);
         values.put(EventDB.level, finalLevel);
-
         // TODO Put Location
 
         MyDatabaseHelper mysql = new MyDatabaseHelper(getContext());
@@ -128,7 +114,7 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
         Toast.makeText(getContext(), "Successfully Added!", Toast.LENGTH_SHORT).show();
     }
 
-    // 按下 EditText 的提示
+    // Press EditView
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.et_date) {
@@ -137,18 +123,11 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
         } else if (v.getId() == R.id.et_time) {
             setupTime();
             Log.i("addEvent", "** Select Time.");
-//        } else if (v.getId() == R.id.et_location) {
-//            setupLocation();
-//            Log.i("addEvent", "** Select Location.");
-//        } else if (v.getId() == R.id.et_share) {
-//            setupShare();
-//            Log.i("addEvent", "** Select Share.");
         } else if (v.getId() == R.id.et_level) {
             setupLevel();
             Log.i("addEvent", "** Select Level.");
         }
     }
-
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -267,6 +246,5 @@ public class AddFragment extends BaseFragment implements View.OnClickListener, C
 
         builder.create().show();
     }
-
 
 }

@@ -11,9 +11,10 @@ public class User {
     public User() {
     }
 
-    public User(int _id, String phone) {
+    public User(int _id, String phone, String name) {
         this._id = _id;
         this.phone = phone;
+        this.name = name;
     }
 
     public User(int _id, String phone, String pwd, String name, String email, String birth) {

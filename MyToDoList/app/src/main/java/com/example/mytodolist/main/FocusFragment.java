@@ -1,5 +1,7 @@
 package com.example.mytodolist.main;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,16 +26,18 @@ public class FocusFragment extends BaseFragment implements View.OnClickListener 
     EditText etFocusTime;
     Button btUp, btDown, btSubmit, btData;
     ProgressBar pgTime;
-    int index = 2;
-    final int[] times = {5, 10, 25, 30, 45, 60, 90, 120};
+    int index = 3;
+    final int[] times = {1, 5, 10, 25, 30, 45, 60, 90, 120};
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.focus_set_time, container, false);
 
-        //TODO Pop Time-Picker
+        // TODO Add Pop Time-Picker
+        //  Personally input event
         etFocusTime = view.findViewById(R.id.et_focus_time);
+
         btUp = view.findViewById(R.id.bt_focus_time_up);
         btDown = view.findViewById(R.id.bt_focus_time_down);
         btSubmit = view.findViewById(R.id.bt_focus_submit);
@@ -46,7 +50,10 @@ public class FocusFragment extends BaseFragment implements View.OnClickListener 
         btData.setOnClickListener(this);
 
         btSubmit.setOnClickListener(l->{
-
+            Intent intent = new Intent(getContext(), TimeCountActivity.class);
+            intent.putExtra("time", times[index]);
+            ActivityOptions options = ActivityOptions.makeCustomAnimation(getContext(), R.anim.slide_in_top, R.anim.slide_in_bottom);
+            startActivity(intent, options.toBundle());
         });
         return view;
     }
@@ -57,7 +64,7 @@ public class FocusFragment extends BaseFragment implements View.OnClickListener 
             Toast.makeText(getContext(), "Data Viewer is developing...Waiting...", Toast.LENGTH_SHORT).show();
             // TODO Add Data Viewer
         } else if (v.getId() == R.id.bt_focus_time_up) {
-            if(index < 7){
+            if(index < times.length-1){
                 pgTime.setProgress(times[++index], true);
                 etFocusTime.setText(times[index]+":00");
             }

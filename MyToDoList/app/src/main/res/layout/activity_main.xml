@@ -20,5 +20,4 @@
         app:menu="@menu/bottom_navigation_menu"
         app:labelVisibilityMode="unlabeled"/>
 
-
 </RelativeLayout>

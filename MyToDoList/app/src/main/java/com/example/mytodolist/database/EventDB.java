@@ -87,7 +87,7 @@ public class EventDB implements MyDatabaseHelper.TableCreateInterface {
         db.update(
                 EventDB.TableName,
                 values,
-                BaseColumns._ID + " =? ",
+                BaseColumns._ID + " = ? ",
                 new String[]{id + ""}
         );
         String content = values.get(EventDB.content).toString();

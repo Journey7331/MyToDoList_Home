@@ -55,7 +55,7 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
         ContentValues admin = new ContentValues();
         admin.put(BaseColumns._ID, 0);
         admin.put(UserDB.phone, "");
-        admin.put(UserDB.name, "phoneNow");
+        admin.put(UserDB.name, "");
         db.insert(UserDB.TableName, null, admin);
 
         Log.i("create", "** User Table Created **");
@@ -104,21 +104,23 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         // 此处要求查询 User.phone
-        Cursor cursor = db.query(UserDB.TableName, null, UserDB.phone + " =? ", new String[]{phone}, null, null, null);
+        Cursor cursor = db.query(
+                UserDB.TableName,
+                null,
+                UserDB.phone + " = ? AND " + UserDB._id + " != ? ",
+                new String[]{phone, 0 + ""},
+                null, null, null);
 
         // 移到第一个
         cursor.moveToFirst();
 
         User user = new User();
-        do {
-            if (Objects.equals(cursor.getString(cursor.getColumnIndex(UserDB.phone)), phone) && cursor.getInt(cursor.getColumnIndex(BaseColumns._ID)) != 0)
-                user.set_id(cursor.getInt(cursor.getColumnIndex(BaseColumns._ID)));
-            user.setPhone(cursor.getString(cursor.getColumnIndex(UserDB.phone)));
-            user.setName(cursor.getString(cursor.getColumnIndex(UserDB.name)));
-            user.setPwd(cursor.getString(cursor.getColumnIndex(UserDB.pwd)));
-            user.setEmail(cursor.getString(cursor.getColumnIndex(UserDB.email)));
-            user.setBirth(cursor.getString(cursor.getColumnIndex(UserDB.birth)));
-        } while (cursor.moveToNext());
+        user.set_id(cursor.getInt(cursor.getColumnIndex(BaseColumns._ID)));
+        user.setPhone(cursor.getString(cursor.getColumnIndex(UserDB.phone)));
+        user.setName(cursor.getString(cursor.getColumnIndex(UserDB.name)));
+        user.setPwd(cursor.getString(cursor.getColumnIndex(UserDB.pwd)));
+        user.setEmail(cursor.getString(cursor.getColumnIndex(UserDB.email)));
+        user.setBirth(cursor.getString(cursor.getColumnIndex(UserDB.birth)));
 
         cursor.close();
         db.close();
@@ -126,31 +128,39 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
         return user;
     }
 
-    public static String getPhone(MyDatabaseHelper dbHelper, int _id) {
+    public static String getPhone(MyDatabaseHelper dbHelper) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor cursor = db.query(UserDB.TableName, null, UserDB._id + " =? ", new String[]{_id + ""}, null, null, null);
+        Cursor cursor = db.query(
+                UserDB.TableName,
+                null,
+                UserDB._id + " = ? ",
+                new String[]{ 0+"" },
+                null, null, null);
         cursor.moveToFirst();
-        String phoneGet  = cursor.getString(cursor.getColumnIndex(UserDB.phone));
+        String phoneGet = "";
+        phoneGet = cursor.getString(cursor.getColumnIndex(UserDB.phone));
 
         cursor.close();
         db.close();
-
         return phoneGet;
     }
 
     public static String getName(MyDatabaseHelper dbHelper, String phone) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor cursor = db.query(UserDB.TableName, null, UserDB.phone + " =? ", new String[]{phone}, null, null, null);
-        int idGet = -1;
-        String nameGet = "null";
-        cursor.moveToFirst();
-        do {
-            idGet = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
+        Cursor cursor = db.query(
+                UserDB.TableName,
+                null,
+                UserDB.phone + " = ? AND " + UserDB._id + " != ? ",
+                new String[]{phone, 0 + ""},
+                null, null, null);
+
+        String nameGet = "Stranger!";
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
             nameGet = cursor.getString(cursor.getColumnIndex(UserDB.name));
-            if (idGet != 0 && idGet != -1) break;
-        } while (cursor.moveToNext());
+        }
 
         cursor.close();
         db.close();
@@ -164,7 +174,7 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
         Cursor cursor = db.query(
                 UserDB.TableName,
                 null,
-                UserDB.phone + " =? ",
+                UserDB.phone + " = ? ",
                 new String[]{phone + ""},
                 null,
                 null,
@@ -192,8 +202,8 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
         Cursor cursor = db.query(
                 UserDB.TableName,
                 null,
-                UserDB.phone + " =? ",
-                new String[]{phone + ""},
+                UserDB.phone + " = ? AND " + UserDB._id + " != ? ",
+                new String[]{phone + "", 0 + ""},
                 null,
                 null,
                 null
@@ -203,20 +213,17 @@ public class UserDB implements MyDatabaseHelper.TableCreateInterface {
             ret = -1;
         } else {
             cursor.moveToFirst();
-//            do {
-                int idGet = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
-                if (idGet != 0) {
-                    String pwd = cursor.getString(cursor.getColumnIndex(UserDB.pwd));
-                    if (pwd.equals(password)) {
-                        Log.i("Login", "** All Correct. Log In Successfully.");
-                        ret = 1;
-                    } else {
-                        Log.i("Login", "** Password Wrong.");
-                        ret = 0;
-                    }
-//                    break;
+            int idGet = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
+            if (idGet != 0) {
+                String pwd = cursor.getString(cursor.getColumnIndex(UserDB.pwd));
+                if (pwd.equals(password)) {
+                    Log.i("Login", "** All Correct. Log In Successfully.");
+                    ret = 1;
+                } else {
+                    Log.i("Login", "** Password Wrong.");
+                    ret = 0;
                 }
-//            } while (cursor.moveToNext());
+            }
         }
 
         cursor.close();

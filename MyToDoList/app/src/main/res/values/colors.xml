@@ -8,4 +8,19 @@
     <color name="dark_grey">#999999</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+
+    <color name="level1">#10451D</color>
+    <color name="level2">#155D27</color>
+    <color name="level3">#1A7431</color>
+    <color name="level4">#208B3A</color>
+    <color name="level5">#25A244</color>
+    <color name="level6">#2DC653</color>
+    <color name="level7">#4AD66D</color>
+    <color name="level8">#6EDE8A</color>
+    <color name="level9">#92E6A7</color>
+    <color name="level10">#B7EFC5</color>
+
+    <color name="top">#036666</color>
+    <color name="bottom">#99e2b4</color>
+
 </resources>

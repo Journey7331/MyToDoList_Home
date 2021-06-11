@@ -19,6 +19,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.HashMap;
 import java.util.Objects;
 
+/**
+ * @program: MyToDoList
+ * @description: MainActivity
+ */
 public class MainActivity extends BaseActivity {
     BottomNavigationView bottomNavigation;
 
@@ -27,8 +31,6 @@ public class MainActivity extends BaseActivity {
     FocusFragment focusFragment;
     MyPageFragment myPageFragment;
     Fragment currentFragment;
-
-    private long exitTime = 0;
 
     User user;
     MyDatabaseHelper mysql = new MyDatabaseHelper(this);
@@ -39,16 +41,16 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         // check log in status
-        String phone = UserDB.getPhone(mysql, 0);
+        String phone = UserDB.getPhone(mysql);
         if ("".equals(phone)) {
-            this.user = new User(0, "");
+            this.user = new User(0, "", "");
         } else {
             this.user = UserDB.getUser(mysql, phone);
         }
 
         // fragment setup
         addFragment = new AddFragment();
-        homeFragment = new HomeFragment();
+        homeFragment = new HomeFragment(this.user.getName());
         focusFragment = new FocusFragment();
         myPageFragment = new MyPageFragment(this.user);
         currentFragment = null;
@@ -63,22 +65,9 @@ public class MainActivity extends BaseActivity {
         bottomNavigation.setItemIconTintList(null);
         bottomNavigation.setOnNavigationItemSelectedListener(bottomNavigationSelectedListener);
 
-    }
-
-    // Press Again to Exit
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-            if ((System.currentTimeMillis() - exitTime > 3000)) {
-                Toast.makeText(getApplicationContext(), "Press Again to Exit", Toast.LENGTH_SHORT).show();
-                exitTime = System.currentTimeMillis();
-            } else {
-                finish();
-                System.exit(0);
-            }
-            return true;
+        if (getIntent().getIntExtra("page", 0) == 4) {
+            bottomNavigation.setSelectedItemId(R.id.page_4);
         }
-        return super.onKeyDown(keyCode, event);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener bottomNavigationSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -109,7 +98,7 @@ public class MainActivity extends BaseActivity {
         hideKeyboard(this);
         switch (position) {
             case 1:
-                homeFragment = new HomeFragment();
+                homeFragment = new HomeFragment(this.user.getName());
                 currentFragment = homeFragment;
                 break;
             case 2:

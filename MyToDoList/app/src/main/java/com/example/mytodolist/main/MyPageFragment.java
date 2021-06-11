@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 public class MyPageFragment extends BaseFragment implements View.OnClickListener {
 
     TextView myName, myEmail, tvLevelCount, tvUndoneCount, tvDoneCount;
-    LinearLayout llUndone;
+    RelativeLayout rlUndone, rlDone, rlGoals;
     View viewSetting;
 
     ProgressBar pgLevel;
@@ -44,7 +45,6 @@ public class MyPageFragment extends BaseFragment implements View.OnClickListener
 
     ArrayList<Event> events;
     User my_account;
-    MyDatabaseHelper mysql = new MyDatabaseHelper(getContext());
 
     // 导入已登录的用户信息
     public MyPageFragment(User user) {
@@ -60,7 +60,9 @@ public class MyPageFragment extends BaseFragment implements View.OnClickListener
         myEmail = view.findViewById(R.id.my_email);
         btLogOut = view.findViewById(R.id.btn_logout);
         viewSetting = view.findViewById(R.id.my_setting);
-        llUndone = view.findViewById(R.id.undone_rl);
+        rlGoals = view.findViewById(R.id.goals_rl);
+        rlUndone = view.findViewById(R.id.undone_rl);
+        rlDone = view.findViewById(R.id.done_rl);
 
         pgLevel = view.findViewById(R.id.pg_level);
         tvLevelCount = view.findViewById(R.id.tv_level_count);
@@ -72,7 +74,9 @@ public class MyPageFragment extends BaseFragment implements View.OnClickListener
         myPageSetUp();
 
         viewSetting.setOnClickListener(this);
-        llUndone.setOnClickListener(this);
+        rlGoals.setOnClickListener(this);
+        rlUndone.setOnClickListener(this);
+        rlDone.setOnClickListener(this);
 
         return view;
     }
@@ -138,11 +142,12 @@ public class MyPageFragment extends BaseFragment implements View.OnClickListener
     public void onClick(View v) {
 
         if (v.getId() == R.id.my_setting) {
-            Toast.makeText(getContext(), "Setting Functions To Be Add. Please Wait...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Setting Functions is developing...", Toast.LENGTH_SHORT).show();
         }
-        if (v.getId() == R.id.undone_rl) {
+        if (v.getId() == R.id.goals_rl || v.getId() == R.id.undone_rl || v.getId() == R.id.done_rl) {
             ((BottomNavigationView) getActivity().findViewById(R.id.bottom_navigation)).setSelectedItemId(R.id.page_1);
-            // Error
+            // TODO Go to Undone Page
+            //  Error
 //            ((SwitchCompat) getActivity().findViewById(R.id.switch_done)).setChecked(false);
         }
 

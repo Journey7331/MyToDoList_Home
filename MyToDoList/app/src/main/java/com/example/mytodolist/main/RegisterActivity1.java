@@ -41,14 +41,14 @@ public class RegisterActivity1 extends BaseRegisterActivity implements View.OnCl
         btnRegister = findViewById(R.id.btn_register);
         btnRegisterCancel = findViewById(R.id.btn_register_cancel);
 
-        // 如果之前有账号和密码,就继续使用,自动放到输入框中
+        // auto fill
         if (getIntent().getStringExtra("phone") != null && getIntent().getStringExtra("pwd") != null) {
             etRegisterId.setText(getIntent().getStringExtra("phone"));
             etRegisterPassword.setText(getIntent().getStringExtra("pwd"));
             etRegisterRepassword.setText(getIntent().getStringExtra("pwd"));
         }
 
-        // 调出输入法进行输入
+        // InputMethodManager
         etRegisterId.requestFocus();
         InputMethodManager server = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         server.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);

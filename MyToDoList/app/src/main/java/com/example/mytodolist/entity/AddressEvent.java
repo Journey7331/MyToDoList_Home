@@ -9,7 +9,7 @@ import android.location.Address;
 
 // TODO Event with address
 // Add MapFragment
-public class AddressEvent implements Comparable{
+public class AddressEvent{
     Event event;
     Address address;
 
@@ -37,10 +37,4 @@ public class AddressEvent implements Comparable{
         this.address = address;
     }
 
-    @Override
-    public int compareTo(Object o) {
-        int id = ((AddressEvent) o).getEvent().get_id();
-        /* For Ascending order*/
-        return this.getEvent().get_id() - id;
-    }
 }

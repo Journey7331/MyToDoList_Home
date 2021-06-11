@@ -38,7 +38,7 @@ import java.util.Locale;
  */
 public class EditFragment extends BaseFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
-    EditText etContent, etMemo, etDate, etTime, etLocation, etShare, etLevel;
+    EditText etContent, etMemo, etDate, etTime, etLevel;
     SwitchCompat switchDate, switchTime, switchLevel;
     Button tvBack, btnSubmit;
 
@@ -69,8 +69,6 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
         etMemo = view.findViewById(R.id.et_memo);
         etDate = view.findViewById(R.id.et_date);
         etTime = view.findViewById(R.id.et_time);
-        etLocation = view.findViewById(R.id.et_location);
-        etShare = view.findViewById(R.id.et_share);
         etLevel = view.findViewById(R.id.et_level);
 
         switchDate = view.findViewById(R.id.switch_date);
@@ -83,12 +81,12 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
         etDate.setOnClickListener(this);
         etTime.setOnClickListener(this);
         etLevel.setOnClickListener(this);
-        tvBack.setOnClickListener(this);
 
         switchDate.setOnCheckedChangeListener(this);
         switchTime.setOnCheckedChangeListener(this);
         switchLevel.setOnCheckedChangeListener(this);
 
+        tvBack.setOnClickListener(l -> getActivity().getSupportFragmentManager().popBackStack());
         btnSubmit.setOnClickListener(l -> {
             if (etContent.length() == 0) {
                 Toast.makeText(getContext(), "Please Add Something.", Toast.LENGTH_SHORT).show();
@@ -135,7 +133,6 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
         values.put(EventDB.date, finalDate);
         values.put(EventDB.time, finalTime);
         values.put(EventDB.level, finalLevel);
-
         //TODO Put Location
 
         MyDatabaseHelper mysql = new MyDatabaseHelper(getContext());
@@ -151,19 +148,13 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
             setupTime();
         } else if (v.getId() == R.id.et_level) {
             setupLevel();
-        } else if (v.getId() == R.id.edit_back) {
-            //            getActivity().onBackPressed();
-//            getActivity().getSupportFragmentManager().popBackStack();
-            Toast.makeText(getContext(), "back", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         // 防止初始化的时候触发监听器
-        if (!buttonView.isPressed()) {
-            return;
-        }
+        if (!buttonView.isPressed()) return;
 
         if (buttonView.getId() == R.id.switch_date) {
             if (isChecked) {
@@ -283,6 +274,5 @@ public class EditFragment extends BaseFragment implements View.OnClickListener, 
 
         builder.create().show();
     }
-
 
 }
