@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -16,8 +15,6 @@ import com.example.mytodolist.database.UserDB;
 import com.example.mytodolist.entity.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * @program: MyToDoList
@@ -70,28 +67,25 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener bottomNavigationSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.page_1:
-                    onFragmentSelected(1, null);
-                    break;
-                case R.id.page_2:
-                    onFragmentSelected(2, null);
-                    break;
-                case R.id.page_3:
-                    onFragmentSelected(3, null);
-                    break;
-                case R.id.page_4:
-                    onFragmentSelected(4, null);
-                    break;
-                case R.id.page_5:
-                    onFragmentSelected(5, null);
-                    break;
-            }
-            return true;
+    private BottomNavigationView.OnNavigationItemSelectedListener bottomNavigationSelectedListener = item -> {
+        switch (item.getItemId()) {
+            case R.id.page_1:
+                onFragmentSelected(1, null);
+                break;
+            case R.id.page_2:
+                onFragmentSelected(2, null);
+                break;
+            case R.id.page_3:
+                onFragmentSelected(3, null);
+                break;
+            case R.id.page_4:
+                onFragmentSelected(4, null);
+                break;
+            case R.id.page_5:
+                onFragmentSelected(5, null);
+                break;
         }
+        return true;
     };
 
     public void onFragmentSelected(int position, Bundle bundle) {

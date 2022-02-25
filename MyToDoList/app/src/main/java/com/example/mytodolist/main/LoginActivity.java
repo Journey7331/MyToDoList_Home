@@ -1,7 +1,9 @@
 package com.example.mytodolist.main;
 
+import android.Manifest;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,11 +12,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.example.mytodolist.R;
 import com.example.mytodolist.base.BaseActivity;
 import com.example.mytodolist.database.MyDatabaseHelper;
 import com.example.mytodolist.database.UserDB;
-import com.example.mytodolist.entity.User;
 
 /**
  * @program: MyToDoList
@@ -84,7 +88,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 values.put(UserDB.phone, phone);
                 UserDB.updateUser(mysql, 0, values);
                 Log.i("Login", "** Log in, Phone was Saved to Uid:0");
-                startActivity(new Intent(this,MainActivity.class));
+                startActivity(new Intent(this, MainActivity.class));
                 // 以防止在MyPage页面中推出到这里时，上次登录的账号密码还在
                 finish();
             }

@@ -1,10 +1,10 @@
 package com.example.mytodolist.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +73,7 @@ public class EventAdapter extends ArrayAdapter {
         return position;
     }
 
+    @SuppressLint("SetTextI18n")
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -126,7 +127,7 @@ public class EventAdapter extends ArrayAdapter {
             } else if (nowtime < dateParse) {
                 viewHolder.tvDate.setText(DateCalc(dateParse, nowtime));
             }
-        }else {
+        } else {
             viewHolder.tvDate.setText("");
         }
 
